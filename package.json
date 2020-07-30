@@ -1,0 +1,34 @@
+{
+  "name": "trackweave",
+  "version": "0.0.5",
+  "description": "A new and intuitive way to link Arweave transactions",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zorbyte/TrackWeave.git"
+  },
+  "keywords": [
+    "linked-list",
+    "fork",
+    "graph",
+    "blockchain",
+    "transaction",
+    "branching",
+    "data-structures",
+    "arweave",
+    "arweave-blockchain",
+    "chronological"
+  ],
+  "author": "zorbyte",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zorbyte/TrackWeave/issues"
+  },
+  "homepage": "https://github.com/zorbyte/TrackWeave#readme",
+  "dependencies": {
+    "arweave": "^1.8.0"
+  }
+}

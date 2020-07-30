@@ -14,7 +14,7 @@ This allows one to traverse along a chronological chain of transactions in a
 bidirectional manner, while still retaining the successive and directed nature
 of a blockchain. The RDT data structure also supports branches, which allows,
 through a simple transaction, the ability to continue a chain independently
-and then conclude the chain my rejoining it with the origin later. The nature
+and then conclude the chain my rejoining it with the origin RST later. The nature
 of branches allows one to create cyclic graphs, however, to remain true to the
 ideals of a directed blockchain, a rejoin can not be associated to a node that
 existed prior to the creation of a branch. Branches open a myriad of
@@ -151,14 +151,14 @@ external RDT structure.
 ### Duplicate Nodes
 
 If a node appears with duplicate data, an ArQL query will rank them based on
-their chronology, thus allowing us to determine that the the second entry is
-invalid; this entry will be ignored.
+their chronology, thus allowing us to determine that the the proceeding entries
+are invalid; these entries will be ignored.
 
 ### Incorrectly configured edges
 
 Say we have tx1 with `Edge-Tail: foo` and `Edge-Head: bar` and tx2 was added
 after tx1 with `Edge-Tail: bar` and `Edge-Head: foo`. This situation would
-cause a cyclic deadlock, and such behaviour is only supported in branches
+cause an infinite loop, and such behaviour is only supported in branches
 although without the deadlocking behaviour. As such, unix time stamps sourced
 from the `Created-At` tag are employed to ensure that transactions that are added in
 the future do not match their `Edge-Head` to an older `Edge-Tail`.
