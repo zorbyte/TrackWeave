@@ -27,7 +27,7 @@ utilise the other RDT that it references as a means to collect further data
 through traversal. As a result, independent ecosystems can integrate external
 data into themselves with ease.
 
-## RDT Specification (WIP)
+## RDT Specification
 
 > Notes:
 > Terminology relating to tree structures is used in conjunction with graph
