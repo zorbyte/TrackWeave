@@ -151,8 +151,8 @@ external RDT structure.
 ### Duplicate Nodes
 
 If a node appears with duplicate data, an ArQL query will rank them based on
-their chronology, thus allowing us to determine that the the second entry is
-invalid; This entry will be ignored.
+their chronology, thus allowing us to determine that the the proceeding entries
+are invalid; These entries will be ignored.
 
 ### Incorrectly configured edges
 
