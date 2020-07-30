@@ -1,6 +1,6 @@
 # TrackWeave - Ramifiable and Directed Transactions
 
-TrackWeave is an implementation for the Ramifiable and Directed Transactions (RDT) data structure,
+TrackWeave is the Ramifiable and Directed Transactions (RDT) data structure,
 a new and intuitive way to link Arweave transactions through chronology, weak linked subtrees and branches.
 
 RDT is a hybrid data structure that aggregates the chronology of a [linked list](https://en.wikipedia.org/wiki/Linked_list),
@@ -138,6 +138,10 @@ thus allowing us to determine that the the second entry is false; This entry wil
 Say we have tx1 with `Edge-Tail: foo` and `Edge-Head: bar` and tx2 was added after tx1 with `Edge-Tail: bar` and `Edge-Head: foo`.
 This situation would cause a cyclic deadlock, and such behaviour is only supported in branches although without the deadlocking behaviour.
 As such, unix time stamps are used to ensure that transactions that are added in the future do not match their `Edge-Head` to a older `Edge-Tail`.
+
+## Todo List
+
+- Write a library for TackWeave interactions in TypeScript.
 
 ## Inspirations
 
