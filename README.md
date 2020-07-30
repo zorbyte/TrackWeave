@@ -21,7 +21,7 @@ existed prior to the creation of a branch. Branches open a myriad of
 opportunities for your transactions through the relationships that can be
 expressed with their cyclic ability. In addition to branches, RDT supports 
 "subtrees," which allow you to link an independent RDT to a node that exists
-elsewhere. What sets apart a subtree from a fork is that an RDT that is referenced
+elsewhere. What sets apart a subtree from a branch is that an RDT that is referenced
 by a subtree is oblivious to the subtree in question, however, the subtree can
 utilise the other RDT that it references as a means to collect further data
 through traversal. As a result, independent ecosystems can integrate external
@@ -96,7 +96,7 @@ Waypoint-Head: [<-R OR R]
 
 ## Branches
 
-Branching a RDT is rather trivial, as you just continue the RDT, but you add
+Branching an RDT is rather trivial, as you just continue the RDT, but you add
 1 to the branch depth. Adding or subtracting more than 1 to the branch depth
 will make it invalid, and the branch will be ignored. When a branch is created,
 its waypoint will be reset to reflect the root of the branch.
@@ -121,8 +121,7 @@ used as the `Edge-Head`. If you attempt to rejoin to a node that predates the
 
 ### Querying for rejoins
 
-Every time a node is added to the chain, it should check if a branch has been
-merged. The following tags will aid this:
+A rejoin can be queried by using the following tags:
 
 ```
 RDT-Type: "Node"

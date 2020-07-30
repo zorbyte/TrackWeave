@@ -29,6 +29,8 @@
   },
   "homepage": "https://github.com/zorbyte/TrackWeave#readme",
   "dependencies": {
-    "arweave": "^1.8.0"
+    "arql-ops": "^1.0.0",
+    "arweave": "^1.8.0",
+    "nanoid": "^3.1.12"
   }
 }
