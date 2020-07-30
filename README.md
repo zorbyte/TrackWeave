@@ -14,7 +14,7 @@ This allows one to traverse along a chronological chain of transactions in a
 bidirectional manner, while still retaining the successive and directed nature
 of a blockchain. The RDT data structure also supports branches, which allows,
 through a simple transaction, the ability to continue a chain independently
-and then conclude the chain my rejoining it with the origin RST later. The nature
+and then conclude the chain by rejoining it with the origin RDT later. The nature
 of branches allows one to create cyclic graphs, however, to remain true to the
 ideals of a directed blockchain, a rejoin can not be associated to a node that
 existed prior to the creation of a branch. Branches open a myriad of
@@ -164,7 +164,7 @@ the future do not match their `Edge-Head` to an older `Edge-Tail`.
 
 ## Todo List
 
-- Write a library for TackWeave interactions in TypeScript.
+- Write a library for TrackWeave interactions in TypeScript.
 
 ## Inspirations
 
