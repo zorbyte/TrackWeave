@@ -15,7 +15,7 @@ through the relationships that can be expressed with its cyclic ability. In addi
 allow you to link an independent RDT to a node that exists elsewhere. What sets apart a subtree from a fork is that a RDT
 that is referenced by a subtree is oblivious to the subtree in question, however the subtree can utilise the other RDT
 that it references as a means to collect further data through traversal. As a result, independent ecosystems can integrate
-external data into themselves with ease. 
+external data into themselves with ease.
 
 ## RDT Specification (WIP)
 
