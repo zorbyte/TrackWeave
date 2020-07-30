@@ -53,10 +53,10 @@ the following tags:
 ```
 # An easy way to indicate that this is the root. Useful for ArQL.
 RDT-Type: "Root"
-RDT-Version?: [Currently, 0.0.4]
+RDT-Version?: [Currently, 0.0.5]
 
 Root-Id: R
-Creation-Timestamp: [UNIX Timestamp]
+Created-At: [UNIX Timestamp]
 Edge-Head: R
 # You can initialise your own subtree through this value.
 Edge-Tail?: <-R
@@ -69,10 +69,10 @@ are configured with the following tags:
 
 ```
 RDT-Type: "Node"
-RDT-Version?: [Currently, 0.0.3]
+RDT-Version?: [Currently, 0.0.5]
 
 Root-Id: <-R
-Creation-Timestamp: [UNIX Timestamp]
+Created-At: [UNIX Timestamp]
 Edge-Head: [R OR See Rejoining a branch]
 Edge-Tail: <-R
 
