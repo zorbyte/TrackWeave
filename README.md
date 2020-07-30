@@ -159,9 +159,9 @@ invalid; This entry will be ignored.
 Say we have tx1 with `Edge-Tail: foo` and `Edge-Head: bar` and tx2 was added
 after tx1 with `Edge-Tail: bar` and `Edge-Head: foo`. This situation would
 cause a cyclic deadlock, and such behaviour is only supported in branches
-although without the deadlocking behaviour. As such, unix time stamps are used
-to ensure that transactions that are added in the future do not match their
-`Edge-Head` to a older `Edge-Tail`.
+although without the deadlocking behaviour. As such, unix time stamps sourced
+from the `Created-At` tag are employed to ensure that transactions that are added in
+the future do not match their `Edge-Head` to an older `Edge-Tail`.
 
 ## Todo List
 
