@@ -80,7 +80,7 @@ Waypoint-Tail: [<-R OR Previous Waypoint-Head OR R]
 Waypoint-Head: [<-R OR R]
 ```
 
-## /Branches
+## Branches
 
 Branching a tree is rather trivial, you just continue the tree but you add 1 to the branch depth.
 Adding or subtracting more than 1 to the branch depth will make it invalid and the branch will be ignored.
