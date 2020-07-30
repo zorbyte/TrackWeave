@@ -1,6 +1,6 @@
 # TrackWeave - Ramifiable and Directed Transactions
 
-TrackWeave is a Ramifiable and Directed Transactions (RDT) data structure,
+TrackWeave is the Ramifiable and Directed Transactions (RDT) data structure,
 a new and intuitive way to link Arweave transactions through chronology,
 linked subtrees, and branches.
 
