@@ -2,27 +2,27 @@
 
 TrackWeave is the Ramifiable and Directed Transactions (RDT) data structure,
 a new and intuitive way to link Arweave transactions through chronology,
-linked subtrees and branches.
+linked subtrees, and branches.
 
 RDT is a hybrid data structure that aggregates the chronology of a
 [linked list](https://en.wikipedia.org/wiki/Linked_list),
 the ramifiability of
-[tree structures](<https://en.wikipedia.org/wiki/Tree_(data_structure)>)
+[tree structures](<https://en.wikipedia.org/wiki/Tree_(data_structure)>),
 and the versatility of
 [graph structures](<https://en.wikipedia.org/wiki/Graph_(data_structure)>).
 This allows one to traverse along a chronological chain of transactions in a
 bidirectional manner, while still retaining the successive and directed nature
-of a blockchain. The RDT data structure also supports branches, which allows
+of a blockchain. The RDT data structure also supports branches, which allows,
 through a simple transaction, the ability to continue a chain independently
 and then conclude the chain my rejoining it with the origin RST later. The nature
-of branches allows one to create cyclic graphs, however to remain true to the
+of branches allows one to create cyclic graphs, however, to remain true to the
 ideals of a directed blockchain, a rejoin can not be associated to a node that
 existed prior to the creation of a branch. Branches open a myriad of
 opportunities for your transactions through the relationships that can be
-expressed with its cyclic ability. In addition to branches, RDT has "subtrees"
-which allow you to link an independent RDT to a node that exists elsewhere.
-What sets apart a subtree from a fork is that a RDT that is referenced by a
-subtree is oblivious to the subtree in question, however the subtree can
+expressed with their cyclic ability. In addition to branches, RDT supports 
+"subtrees," which allow you to link an independent RDT to a node that exists
+elsewhere. What sets apart a subtree from a fork is that an RDT that is referenced
+by a subtree is oblivious to the subtree in question, however, the subtree can
 utilise the other RDT that it references as a means to collect further data
 through traversal. As a result, independent ecosystems can integrate external
 data into themselves with ease.
@@ -79,10 +79,10 @@ Edge-Tail: <-R
 # Use 0 if the degree of the tree is 0.
 Branch-Depth: <-N OR 0 OR <-N + 1
 # When a branch is made, the value should be set to Edge-Tail
-# after that, additional nodes should use the previous Branch-Edge-Tail
+# After that, additional nodes should use the previous Branch-Edge-Tail
 Branch-Edge-Tail?: [<-Branch-Edge-Tail OR Value of Edge-Tail]
 
-# A waypoint is a means to quickly jump around the chain
+# A waypoint is a means of quickly jumping around the chain
 # if you're stuck in an undesirable location.
 # When the degree of the tree is 0, the first waypoint is
 # instantiated with both Waypoint-Tail and Waypoint-Head
@@ -96,10 +96,10 @@ Waypoint-Head: [<-R OR R]
 
 ## Branches
 
-Branching a RDT is rather trivial, you just continue the RDT but you add 1 to
-the branch depth. Adding or subtracting more than 1 to the branch depth will
-make it invalid and the branch will be ignored. When a branch is created, its
-waypoint will be reset to reflect the root of the branch.
+Branching a RDT is rather trivial, as you just continue the RDT, but you add
+1 to the branch depth. Adding or subtracting more than 1 to the branch depth
+will make it invalid, and the branch will be ignored. When a branch is created,
+its waypoint will be reset to reflect the root of the branch.
 
 ### Querying branches
 
@@ -122,7 +122,7 @@ used as the `Edge-Head`. If you attempt to rejoin to a node that predates the
 ### Querying for rejoins
 
 Every time a node is added to the chain, it should check if a branch has been
-merged, the following tags will aid this:
+merged. The following tags will aid this:
 
 ```
 RDT-Type: "Node"
@@ -152,7 +152,7 @@ external RDT structure.
 
 If a node appears with duplicate data, an ArQL query will rank them based on
 their chronology, thus allowing us to determine that the the proceeding entries
-are invalid; These entries will be ignored.
+are invalid; these entries will be ignored.
 
 ### Incorrectly configured edges
 
