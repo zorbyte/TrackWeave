@@ -150,4 +150,6 @@ As such, unix time stamps are used to ensure that transactions that are added in
 
 ## License
 
-License under the MIT License. See more in [LICENSE](./LICENSE)
+The code contained within this repository is licensed under the MIT license,
+the copy of which pertaining to this repository is accessible at
+[`./LICENSE`](./LICENSE) relative to the root directory of the repository.
