@@ -39,7 +39,7 @@ To create a RDT graph, a root node must be configured with the following tags:
 ```
 # An easy way to indicate that this is the root. Useful for ArQL
 RDT-Type: "Root"
-RDT-Version?: [Currently, 0.0.1]
+RDT-Version?: [Currently, 0.0.2]
 
 Root-Id: R
 Edge-Head: R
@@ -54,7 +54,7 @@ are configured with the following tags
 
 ```
 RDT-Type: "Node"
-RDT-Version?: [Currently, 0.0.1]
+RDT-Version?: [Currently, 0.0.2]
 
 Root-Id: <-R
 Edge-Head: [R OR See Rejoining a branch]
