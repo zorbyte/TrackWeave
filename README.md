@@ -53,7 +53,7 @@ the following tags:
 ```
 # An easy way to indicate that this is the root. Useful for ArQL.
 RDT-Type: "Root"
-RDT-Version?: [Currently, 0.0.3]
+RDT-Version?: [Currently, 0.0.4]
 
 Root-Id: R
 Creation-Timestamp: [UNIX Timestamp]
@@ -76,11 +76,11 @@ Creation-Timestamp: [UNIX Timestamp]
 Edge-Head: [R OR See Rejoining a branch]
 Edge-Tail: <-R
 
-# Use zero if the degree of the tree is 0.
+# Use 0 if the degree of the tree is 0.
 Branch-Depth: <-N OR 0 OR <-N + 1
 # When a branch is made, the value should be set to Edge-Tail
-# after that, additional nodes should use the previous Branch-Tail
-Branch-Tail?: [<-Branch-Tail OR Value of Edge-Tail]
+# after that, additional nodes should use the previous Branch-Edge-Tail
+Branch-Edge-Tail?: [<-Branch-Edge-Tail OR Value of Edge-Tail]
 
 # A waypoint is a means to quickly jump around the chain
 # if you're stuck in an undesirable location.
@@ -101,10 +101,9 @@ the branch depth. Adding or subtracting more than 1 to the branch depth will
 make it invalid and the branch will be ignored. When a branch is created, its
 waypoint will be reset to reflect the root of the branch.
 
-### Querying branch
+### Querying branches
 
-Every time a node is added to a chain, it checks if a branch has been made,
-this is done by querying for the following:
+Querying a branch can be achieved by using the following tags:
 
 ```
 RDT-Type: "Node"
@@ -113,12 +112,14 @@ Branch-Depth: [Branch-Depth + 1]
 Edge-Tail: [Current Branch-Head]
 ```
 
-#### Rejoining a branch
+### Rejoining a branch
 
 To rejoin with the chain of the ancestral origin of a branch, any transaction of
-that chain that outdates the `Branch-Tail` or is equal to it needs to be used
-as the `Edge-Head`. If you attempt to rejoin to a node that predates the
-`Branch-Tail`, the rejoin will be ignored by the traversal algorithm.
+that chain that outdates the `Branch-Edge-Tail` or is equal to it needs to be
+used as the `Edge-Head`. If you attempt to rejoin to a node that predates the
+`Branch-Edge-Tail`, the rejoin will be ignored by the traversal algorithm.
+
+### Querying for rejoins
 
 Every time a node is added to the chain, it should check if a branch has been
 merged, the following tags will aid this:
@@ -127,10 +128,11 @@ merged, the following tags will aid this:
 RDT-Type: "Node"
 Root-Id: [Current Root-Id]
 Branch-Depth: [Branch-Depth + 1]
-Edge-Head: [Current Waypoint-Head]
+Branch-Edge-Tail: [Branch-Edge]
+Edge-Head: [Desired Edge-Head]
 ```
 
-### Creating subtrees
+## Subtrees
 
 A subtree is similar to a branch, but is useful for different things. A branch
 allows an insertion of alternative history before potentially migrating to the
@@ -144,15 +146,15 @@ Creating a subtree is exactly the same as creating a root node, however the
 `Edge-Tail` tag is utilised in order to make a one way reference to the
 external RDT structure.
 
-### Structural Integrity Checks
+## Structural Integrity Checks
 
-#### Duplicate Nodes
+### Duplicate Nodes
 
 If a node appears with duplicate data, an ArQL query will rank them based on
 their chronology, thus allowing us to determine that the the second entry is
 invalid; This entry will be ignored.
 
-#### Incorrectly configured edges
+### Incorrectly configured edges
 
 Say we have tx1 with `Edge-Tail: foo` and `Edge-Head: bar` and tx2 was added
 after tx1 with `Edge-Tail: bar` and `Edge-Head: foo`. This situation would
