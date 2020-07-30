@@ -5,7 +5,7 @@ a new and intuitive way to link Arweave transactions through chronology, weak li
 
 RDT is a data structure that aggregates the chronology of a [linked lists](https://en.wikipedia.org/wiki/Linked_list),
 the ramifiability of [tree structures](https://en.wikipedia.org/wiki/Tree_(data_structure)) and the versatility of
-[graphs structures](https://en.wikipedia.org/wiki/Graph_(data_structure)). This allows one to traverse along a chain
+[graph structures](https://en.wikipedia.org/wiki/Graph_(data_structure)). This allows one to traverse along a chain
 of transactions chronologically, while retaining the successive and acyclic ideals of a blockchain.
 The RDT data structure also supports branchs, which opens a myriad of opportunities
 for your data and metadata through the relationships this kinda of structure can express.
