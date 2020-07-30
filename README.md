@@ -18,17 +18,17 @@ __Todo.__
 
 ## RDT Specification (WIP)
 
+> Notes:
 > Terminology relating to tree structures is used in conjunction with graph terminology in this specification.
-
-RDT uses [nanoid](https://github.com/ai/nanoid)s for its random strings for its random numbers.
+> RDT uses [nanoids](https://github.com/ai/nanoid) for its random strings.
 
 ### Key
 
-A __new__ random number is denoted by R.
+A __new__ random number is denoted by `R`.
 
-A random string of the same tag in the previous transaction is denoted by <-R
+A number is denoted by `N`.
 
-A number is denoted by N.
+Data that is replicated from a previous node at the same tag is prefixed with `<-`
 
 Tags in the format `Tag?: Data` represent optional tags.
 
@@ -37,7 +37,7 @@ Tags in the format `Tag?: Data` represent optional tags.
 To create a RDT graph, a root node must be configured with the following tags:
 
 ```
-# An easy way to indicate that this is the root. Useful for ArQL
+# An easy way to indicate that this is the root. Useful for ArQL.
 RDT-Type: "Root"
 RDT-Version?: [Currently, 0.0.2]
 
@@ -49,8 +49,8 @@ Edge-Tail?: <-R
 
 ### Regular Nodes
 
-Regular Transactions that you wish to participate in a graph
-are configured with the following tags
+Regular transactions that you wish to participate as a node in the graph
+are configured with the following tags:
 
 ```
 RDT-Type: "Node"
