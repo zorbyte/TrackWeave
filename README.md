@@ -19,7 +19,7 @@ of branches allows one to create cyclic graphs, however, to remain true to the
 ideals of a directed blockchain, a rejoin can not be associated to a node that
 existed prior to the creation of a branch. Branches open a myriad of
 opportunities for your transactions through the relationships that can be
-expressed with their cyclic ability. In addition to branches, RDT supports 
+expressed with their cyclic ability. In addition to branches, RDT supports
 "subtrees," which allow you to link an independent RDT to a node that exists
 elsewhere. What sets apart a subtree from a branch is that an RDT that is referenced
 by a subtree is oblivious to the subtree in question, however, the subtree can
@@ -52,14 +52,16 @@ the following tags:
 
 ```
 # An easy way to indicate that this is the root. Useful for ArQL.
-RDT-Type: "Root"
-RDT-Version?: [Currently, 0.0.5]
+RDT-Type: "root"
+RDT-Major-Version: [Currently, 0]
 
+# Node metadata.
 Root-Id: R
 Created-At: [UNIX Timestamp]
-Edge-Head: R
+
 # You can initialise your own subtree through this value.
-Edge-Tail?: <-R
+Tail-Node?: <-Head-Node
+Head-Node: R
 ```
 
 ### Regular Nodes
@@ -68,30 +70,34 @@ Regular transactions that you wish to participate as a node in the RDT
 are configured with the following tags:
 
 ```
-RDT-Type: "Node"
-RDT-Version?: [Currently, 0.0.5]
+RDT-Type: "node"
+RDT-Major-Version: [Currently, 0]
 
-Root-Id: <-R
+# Node metadata.
+Root-Id: <-Root-Id
 Created-At: [UNIX Timestamp]
-Edge-Head: [R OR See Rejoining a branch]
-Edge-Tail: <-R
+
+# Edges of nodes.
+Tail-Node: <-Head-Node
+Head-Node: [R OR See Rejoining a branch]
 
 # Use 0 if the degree of the tree is 0.
 Branch-Depth: <-N OR 0 OR <-N + 1
-# When a branch is made, the value should be set to Edge-Tail
-# After that, additional nodes should use the previous Branch-Edge-Tail
-Branch-Edge-Tail?: [<-Branch-Edge-Tail OR Value of Edge-Tail]
+# When a branch is made, the value should be set to Tail-Node
+# After that, additional nodes should use the previous Branch-Tail-Node
+Branch-Tail-Node?: [<-Branch-Tail-Node OR Value of Tail-Node]
 
 # A waypoint is a means of quickly jumping around the chain
 # if you're stuck in an undesirable location.
 # When the degree of the tree is 0, the first waypoint is
 # instantiated with both Waypoint-Tail and Waypoint-Head
 # being assigned to an R. The waypoint values do not change
-# unless you want to create a new waypoint.To create a new
+# unless you want to create a new waypoint. To create a new
 # waypoint, set the value of Waypoint-Tail to the previous
 # Waypoint-Head, and set the value the Waypoint-Head to an R.
-Waypoint-Tail: [<-R OR Previous Waypoint-Head OR R]
-Waypoint-Head: [<-R OR R]
+# When finding a waypoint, use tail->head or vice-versa.
+Waypoint-Tail: [<-Waypoint-Tail OR <-Waypoint-Head OR R]
+Waypoint-Head: [<-Waypoint-Head OR R]
 ```
 
 ## Branches
@@ -109,15 +115,15 @@ Querying a branch can be achieved by using the following tags:
 RDT-Type: "Node"
 Root-Id: [Current Root-Id]
 Branch-Depth: [Branch-Depth + 1]
-Edge-Tail: [Current Branch-Head]
+Tail-Node: [Current Branch-Head]
 ```
 
 ### Rejoining a branch
 
 To rejoin with the chain of the ancestral origin of a branch, any transaction of
-that chain that outdates the `Branch-Edge-Tail` or is equal to it needs to be
-used as the `Edge-Head`. If you attempt to rejoin to a node that predates the
-`Branch-Edge-Tail`, the rejoin will be ignored by the traversal algorithm.
+that chain that outdates the `Branch-Tail-Node` or is equal to it needs to be
+used as the `Head-Node`. If you attempt to rejoin to a node that predates the
+`Branch-Tail-Node`, the rejoin will be ignored by the traversal algorithm.
 
 ### Querying for rejoins
 
@@ -127,8 +133,8 @@ A rejoin can be queried by using the following tags:
 RDT-Type: "Node"
 Root-Id: [Current Root-Id]
 Branch-Depth: [Branch-Depth + 1]
-Branch-Edge-Tail: [Branch-Edge]
-Edge-Head: [Desired Edge-Head]
+Branch-Tail-Node: [Branch-Tail]
+Head-Node: [Desired Head-Node]
 ```
 
 ## Subtrees
@@ -142,7 +148,7 @@ node. This is useful if you wish to demonstrate that there is a relationship
 with a node that exists elsewhere and the genesis of a new RDT.
 
 Creating a subtree is exactly the same as creating a root node, however the
-`Edge-Tail` tag is utilised in order to make a one way reference to the
+`Tail-Node` tag is utilised in order to make a one way reference to the
 external RDT structure.
 
 ## Structural Integrity Checks
@@ -155,12 +161,12 @@ are invalid; these entries will be ignored.
 
 ### Incorrectly configured edges
 
-Say we have tx1 with `Edge-Tail: foo` and `Edge-Head: bar` and tx2 was added
-after tx1 with `Edge-Tail: bar` and `Edge-Head: foo`. This situation would
+Say we have tx1 with `Tail-Node: foo` and `Head-Node: bar` and tx2 was added
+after tx1 with `Tail-Node: bar` and `Head-Node: foo`. This situation would
 cause an infinite loop, and such behaviour is only supported in branches
 although without the deadlocking behaviour. As such, unix time stamps sourced
 from the `Created-At` tag are employed to ensure that transactions that are added in
-the future do not match their `Edge-Head` to an older `Edge-Tail`.
+the future do not match their `Head-Node` to an older `Tail-Node`.
 
 ## Todo List
 
