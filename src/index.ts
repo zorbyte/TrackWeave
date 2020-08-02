@@ -123,7 +123,7 @@ export async function findRootNode({
   // Get oldest one, as others are not the original.
   const txId = txIds[txIds.length - 1];
 
-  const tags = await getTags(txId);
+  const tags = await fetchTags(txId);
   const mapped = mapTags(tags, ROOT_NODE_TAG_MAP);
 
   return mapped;
@@ -195,7 +195,7 @@ export async function getNode<D extends number, F extends boolean>(
 
   const nodes = await Promise.all(
     txIds.map(async (txId) => {
-      const tags = await getTags(txId);
+      const tags = await fetchTags(txId);
       const mapped = mapTags(
         tags,
         depth > 0 ? BRANCH_NODE_TAG_MAP : NODE_TAG_MAP
@@ -304,11 +304,9 @@ function mapTags<M extends TagMap<RDTRootNode>, T extends TagType<M>>(
   return mapped;
 }
 
-async function getTags(txId: string) {
+async function fetchTags(txId: string) {
   assertClient(client);
-  const { status, statusText, data } = await client.api.get(
-    "tx/s_J499lYQl4B-ERlUiN5NB1yGuNG6-nFWnSJCCt8hiI/tags"
-  );
+  const { status, statusText, data } = await client.api.get(txId);
 
   if (status >= 300) throw new Error(`${status}: ${statusText}`);
 
