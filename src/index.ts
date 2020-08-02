@@ -152,7 +152,7 @@ export async function getNode<D extends number, F extends boolean>(
     walletAddr,
   }: GetNodeOpts & { depth?: D; fetchGreedily?: F }
 ): Promise<
-  typeof depth extends 0
+  D extends 0
     ? F extends false
       ? RDTNode
       : RDTNode[]
