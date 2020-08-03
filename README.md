@@ -86,26 +86,13 @@ Branch-Depth: <-N OR 0 OR <-N + 1
 # When a branch is made, the value should be set to Tail-Node
 # After that, additional nodes should use the previous Branch-Tail-Node
 Branch-Tail-Node?: [<-Branch-Tail-Node OR Value of Tail-Node]
-
-# A waypoint is a means of quickly jumping around the chain
-# if you're stuck in an undesirable location.
-# When the degree of the tree is 0, the first waypoint is
-# instantiated with both Waypoint-Tail and Waypoint-Head
-# being assigned to an R. The waypoint values do not change
-# unless you want to create a new waypoint. To create a new
-# waypoint, set the value of Waypoint-Tail to the previous
-# Waypoint-Head, and set the value the Waypoint-Head to an R.
-# When finding a waypoint, use tail->head or vice-versa.
-Waypoint-Tail: [<-Waypoint-Tail OR <-Waypoint-Head OR R]
-Waypoint-Head: [<-Waypoint-Head OR R]
 ```
 
 ## Branches
 
 Branching an RDT is rather trivial, as you just continue the RDT, but you add
 1 to the branch depth. Adding or subtracting more than 1 to the branch depth
-will make it invalid, and the branch will be ignored. When a branch is created,
-its waypoint will be reset to reflect the root of the branch.
+will make it invalid, and the branch will be ignored.
 
 ### Querying branches
 
@@ -167,10 +154,6 @@ cause an infinite loop, and such behaviour is only supported in branches
 although without the deadlocking behaviour. As such, unix time stamps sourced
 from the `Created-At` tag are employed to ensure that transactions that are added in
 the future do not match their `Head-Node` to an older `Tail-Node`.
-
-## Todo List
-
-- Write a library for TrackWeave interactions in TypeScript.
 
 ## Inspirations
 
