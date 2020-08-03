@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "incremental": false,
-    "noEmit": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "noEmit": false,
     "allowJs": false,
     "checkJs": false,
     "alwaysStrict": true,
-    "declaration": false,
-    "sourceMap": false,
+    "declaration": true,
+    "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": ["esnext"],
+    "lib": ["esnext", "DOM"],
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -29,6 +30,6 @@
     "target": "es2020",
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "package.json", "LICENSE"],
+  "include": ["src/**/*", "test.ts", "package.json", "LICENSE"],
   "exclude": ["node_modules"]
 }

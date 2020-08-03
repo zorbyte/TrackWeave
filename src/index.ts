@@ -71,7 +71,7 @@ export function createNode<N extends RDTRootNode<NodeType>>(
 
 export function getNodeTags<N extends RDTRootNode<NodeType>>(node: N) {
   // @ts-expect-error
-  node.createdAt = node.createdAt.getUTCDate();
+  node.createdAt = node.createdAt.getTime();
   const tags = mapValuesToTags(
     ((node as unknown) as RDTBranchNode).branchTail
       ? BRANCH_NODE_TAG_MAP

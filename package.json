@@ -1,10 +1,10 @@
 {
   "name": "trackweave",
-  "version": "0.0.7",
+  "version": "0.1.1",
   "description": "A new and intuitive way to link Arweave transactions",
-  "main": "./dist/index.js",
+  "main": "./dist/test.js",
   "scripts": {
-    "test": "node ."
+    "test": "tsc && node ."
   },
   "repository": {
     "type": "git",

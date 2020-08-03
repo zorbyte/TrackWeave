@@ -41,11 +41,13 @@ export function mapValuesToTags<
   N extends RDTRootNode<NodeType>,
   M extends TagMap<N>
 >(tagMap: M, node: N): Record<string, string> {
-  let result = { ...tagMap } as Record<string, string>;
+  let result = {} as Record<string, string>;
   const { otherTags = {} } = node;
 
-  for (const [key, value] of Object.entries({ node })) {
-    result[key] = value.toString?.() ?? `${value}`;
+  for (const [key, value] of Object.entries(node)) {
+    const resultKey = tagMap[key as keyof M];
+    if (!resultKey) continue;
+    result[resultKey] = value.toString?.() ?? `${value}`;
   }
 
   result = { ...result, ...otherTags };

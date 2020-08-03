@@ -6,7 +6,7 @@ import { NodeType } from ".";
 export interface RDTRootNode<T = NodeType.Root> {
   txId?: string;
 
-  type:T;
+  type: T;
   majorVersion: number;
 
   root: string;
@@ -18,7 +18,7 @@ export interface RDTRootNode<T = NodeType.Root> {
   otherTags?: Record<string, string>;
 }
 
-export type AbstractRTDRootNode = string | RDTRootNode;
+export type AbstractRDTRootNode = string | RDTRootNode;
 
 export const ROOT_NODE_TAG_MAP: TagMap<RDTRootNode> = {
   type: "RDT-Type",
@@ -33,20 +33,17 @@ export const ROOT_NODE_TAG_MAP: TagMap<RDTRootNode> = {
 
 interface FindRootNodeOpts {
   // Either the id of the root node, or a node with the root node ID.
-  abstractNode?: AbstractRTDRootNode;
+  abstractNode?: AbstractRDTRootNode;
   walletAddr?: string;
 }
 
 export async function findRootNode(
   client: Arweave,
-  {
-    abstractNode,
-    walletAddr,
-  }: FindRootNodeOpts,
+  { abstractNode, walletAddr }: FindRootNodeOpts
 ) {
   if (!abstractNode && !walletAddr) {
     throw new TypeError(
-      "Insufficient arguments: abstractNode and/or walletAddr must be provided",
+      "Insufficient arguments: abstractNode and/or walletAddr must be provided"
     );
   }
 
@@ -56,8 +53,8 @@ export async function findRootNode(
     exprs.push(
       equals(
         "Root-Id",
-        typeof abstractNode === "string" ? abstractNode : abstractNode!.root,
-      ),
+        typeof abstractNode === "string" ? abstractNode : abstractNode!.root
+      )
     );
   }
 
@@ -70,7 +67,7 @@ export async function findRootNode(
 
   const tags = await fetchTags(client, txId);
   const mapped = mapTagsToValues(ROOT_NODE_TAG_MAP, tags);
-  mapped.txId = txId
+  mapped.txId = txId;
   mapped.createdAt = new Date(mapped.createdAt);
 
   return mapped;

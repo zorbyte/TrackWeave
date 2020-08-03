@@ -1,4 +1,4 @@
-import { RDTRootNode, ROOT_NODE_TAG_MAP, AbstractRTDRootNode } from "./root";
+import { RDTRootNode, ROOT_NODE_TAG_MAP, AbstractRDTRootNode } from "./root";
 import { TagMap, fetchTags, mapTagsToValues } from "./tags";
 import { RDTBranchNode, BRANCH_NODE_TAG_MAP } from "./branch";
 import { ArqlOp, equals, and } from "arql-ops";
@@ -16,7 +16,7 @@ export const NODE_TAG_MAP: TagMap<RDTNode> = {
 };
 
 interface GetNodeOpts<D extends number, F extends boolean> {
-  root: AbstractRTDRootNode;
+  root: AbstractRDTRootNode;
 
   tail?: string;
   head?: string;
@@ -30,22 +30,21 @@ interface GetNodeOpts<D extends number, F extends boolean> {
   walletAddr?: string;
 }
 
-// TODO(@zorbyte): Add type safety to check for [tail and/or head].
 export async function getNode(
   client: Arweave,
-  opts: GetNodeOpts<0, false>,
+  opts: GetNodeOpts<0, false>
 ): Promise<RDTNode>;
 export async function getNode(
   client: Arweave,
-  opts: GetNodeOpts<0, true>,
+  opts: GetNodeOpts<0, true>
 ): Promise<RDTNode[]>;
 export async function getNode(
   client: Arweave,
-  opts: GetNodeOpts<number, false>,
+  opts: GetNodeOpts<number, false>
 ): Promise<RDTBranchNode>;
 export async function getNode(
   client: Arweave,
-  opts: GetNodeOpts<number, true>,
+  opts: GetNodeOpts<number, true>
 ): Promise<RDTBranchNode[]>;
 export async function getNode<D extends number, F extends boolean>(
   client: Arweave,
@@ -56,7 +55,7 @@ export async function getNode<D extends number, F extends boolean>(
     depth = 0 as D,
     fetchGreedily = false as F,
     walletAddr,
-  }: GetNodeOpts<D, F>,
+  }: GetNodeOpts<D, F>
 ) {
   if (!tail && !head) {
     throw new TypeError("Insufficient arguments: tail or head must be defined");
@@ -95,20 +94,24 @@ export async function getNode<D extends number, F extends boolean>(
       const tags = await fetchTags(client, txId);
       const node = mapTagsToValues(
         depth > 0 ? BRANCH_NODE_TAG_MAP : NODE_TAG_MAP,
-        tags,
+        tags
       );
 
-      node.majorVersion = parseInt(node.majorVersion as unknown as string);
+      node.majorVersion = parseInt((node.majorVersion as unknown) as string);
       node.txId = txId;
-      node.depth = parseInt(node.depth as unknown as string) as 0;
+      node.depth = parseInt((node.depth as unknown) as string) as 0;
       node.createdAt = new Date(node.createdAt);
 
       return node;
-    }),
+    })
   );
 
-  return nodes as D extends 0 ? F extends false ? RDTNode : RDTNode[]
-    : F extends false ? RDTBranchNode
+  return nodes as D extends 0
+    ? F extends false
+      ? RDTNode
+      : RDTNode[]
+    : F extends false
+    ? RDTBranchNode
     : RDTBranchNode[];
 }
 
@@ -120,15 +123,15 @@ interface GetNodeWithDirOpts<D extends number> {
 
 export function getTailNode(
   client: Arweave,
-  opts: GetNodeWithDirOpts<0>,
+  opts: GetNodeWithDirOpts<0>
 ): Promise<RDTNode>;
 export function getTailNode(
   client: Arweave,
-  opts: GetNodeWithDirOpts<number>,
+  opts: GetNodeWithDirOpts<number>
 ): Promise<RDTBranchNode>;
 export function getTailNode<D extends number>(
   client: Arweave,
-  { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>,
+  { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>
 ) {
   const { root, tail } = node;
   return getNode(client, { root, depth, tail, walletAddr });
@@ -136,15 +139,15 @@ export function getTailNode<D extends number>(
 
 export function getHeadNode(
   client: Arweave,
-  opts: GetNodeWithDirOpts<0>,
+  opts: GetNodeWithDirOpts<0>
 ): Promise<RDTNode>;
 export function getHeadNode(
   client: Arweave,
-  opts: GetNodeWithDirOpts<number>,
+  opts: GetNodeWithDirOpts<number>
 ): Promise<RDTBranchNode>;
 export function getHeadNode<D extends number>(
   client: Arweave,
-  { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>,
+  { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>
 ) {
   const { root, tail } = node;
   return getNode(client, { root, depth, tail, walletAddr });
@@ -171,11 +174,11 @@ interface TraverseNodesOpts<M extends number> {
 
 export function traverseNodes(
   client: Arweave,
-  opts: TraverseNodesOpts<0>,
+  opts: TraverseNodesOpts<0>
 ): AsyncGenerator<RDTNode>;
 export function traverseNodes(
   client: Arweave,
-  opts: TraverseNodesOpts<number>,
+  opts: TraverseNodesOpts<number>
 ): AsyncGenerator<RDTNode | RDTBranchNode>;
 export async function* traverseNodes<D extends number>(
   client: Arweave,
@@ -184,17 +187,18 @@ export async function* traverseNodes<D extends number>(
     amount,
     maxBranchDepth = 0 as D,
     walletAddr,
-  }: TraverseNodesOpts<D>,
+  }: TraverseNodesOpts<D>
 ): AsyncGenerator<RDTNode | RDTBranchNode> {
   if (!amount) return;
   const forward = Math.sign(amount) > 0 ? true : false;
   amount = Math.abs(amount);
 
   while (--amount) {
-    const res = await (forward ? getHeadNode : getTailNode)(
-      client,
-      { node: entryNode, depth: maxBranchDepth, walletAddr },
-    );
+    const res = await (forward ? getHeadNode : getTailNode)(client, {
+      node: entryNode,
+      depth: maxBranchDepth,
+      walletAddr,
+    });
 
     yield res;
   }
