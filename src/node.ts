@@ -1,7 +1,7 @@
 import { RDTRootNode, ROOT_NODE_TAG_MAP, AbstractRDTRootNode } from "./root";
 import { TagMap, fetchTags, mapTagsToValues } from "./tags";
 import { RDTBranchNode, BRANCH_NODE_TAG_MAP } from "./branch";
-import { ArqlOp, equals, and } from "arql-ops";
+import { ArqlOp, equals, and, or } from "arql-ops";
 import { Arweave } from "./utils";
 import { NodeType } from ".";
 
@@ -18,6 +18,7 @@ export const NODE_TAG_MAP: TagMap<RDTNode> = {
 interface GetNodeOpts<D extends number, F extends boolean> {
   root: AbstractRDTRootNode;
 
+  // Find a node with their head or tail values set to this.
   tail?: string;
   head?: string;
 
@@ -62,11 +63,10 @@ export async function getNode<D extends number, F extends boolean>(
   }
 
   const prev: ArqlOp[] = [];
-  const curr: ArqlOp[] = [];
+  const curr: ArqlOp[] = [equals("Branch-Depth", depth.toString())];
   const next: ArqlOp[] = [];
   const query: ArqlOp[] = [
     equals("Root-Id", typeof root === "string" ? root : root.root),
-    equals("Branch-Depth", depth.toString()),
   ];
 
   if (walletAddr) curr.push(equals("from", walletAddr));
@@ -85,12 +85,11 @@ export async function getNode<D extends number, F extends boolean>(
   if (prev.length) combined.push(and(...prev));
   if (next.length) combined.push(and(...next));
 
-  query.push(...combined);
+  query.push(or(...combined));
 
   const txIds = await client.arql(query);
-
   const nodes = await Promise.all(
-    txIds.map(async (txId) => {
+    txIds.map(async (txId, idx) => {
       const tags = await fetchTags(client, txId);
       const node = mapTagsToValues(
         depth > 0 ? BRANCH_NODE_TAG_MAP : NODE_TAG_MAP,
@@ -102,7 +101,7 @@ export async function getNode<D extends number, F extends boolean>(
       node.depth = parseInt((node.depth as unknown) as string) as 0;
       node.createdAt = new Date(node.createdAt);
 
-      return node;
+      if (idx) return node;
     })
   );
 
@@ -134,7 +133,7 @@ export function getTailNode<D extends number>(
   { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>
 ) {
   const { root, tail } = node;
-  return getNode(client, { root, depth, tail, walletAddr });
+  return getNode(client, { root, depth, head: tail, walletAddr });
 }
 
 export function getHeadNode(
@@ -149,8 +148,8 @@ export function getHeadNode<D extends number>(
   client: Arweave,
   { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>
 ) {
-  const { root, tail } = node;
-  return getNode(client, { root, depth, tail, walletAddr });
+  const { root, head } = node;
+  return getNode(client, { root, depth, tail: head, walletAddr });
 }
 
 interface TraverseNodesOpts<M extends number> {
