@@ -43,7 +43,7 @@ export function createNode<N extends RDTRootNode<NodeType>>(
 ): RDTBranchNode;
 export function createNode<N extends RDTRootNode<NodeType>>(
   tailNode: N,
-  createBranch: true
+  createBranch: false
 ): RDTNode;
 export function createNode<N extends RDTRootNode<NodeType>>(
   tailNode: N,
