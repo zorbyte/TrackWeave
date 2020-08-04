@@ -62,7 +62,7 @@ export function createNode<N extends RDTRootNode<NodeType>>(
   };
 
   if (createBranch) {
-    (baseNode as RDTBranchNode).branchTail = baseNode.tail;
+    (baseNode as RDTBranchNode).branchTail = baseNode.head;
     return baseNode as RDTBranchNode;
   }
 

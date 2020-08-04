@@ -1,9 +1,10 @@
 import { RDTRootNode, ROOT_NODE_TAG_MAP, AbstractRDTRootNode } from "./root";
 import { TagMap, fetchTags, mapTagsToValues } from "./tags";
 import { RDTBranchNode, BRANCH_NODE_TAG_MAP } from "./branch";
-import { ArqlOp, equals, and, or } from "arql-ops";
 import { Arweave } from "./utils";
 import { NodeType } from ".";
+
+import { ArqlOp, equals, and, or } from "arql-ops";
 
 export interface RDTNode extends RDTRootNode<NodeType.Node> {
   depth: number;
@@ -33,19 +34,19 @@ interface GetNodeOpts<D extends number, F extends boolean> {
 
 export async function getNode(
   client: Arweave,
-  opts: GetNodeOpts<0, false>
+  opts: GetNodeOpts<0, false>,
 ): Promise<RDTNode>;
 export async function getNode(
   client: Arweave,
-  opts: GetNodeOpts<0, true>
+  opts: GetNodeOpts<0, true>,
 ): Promise<RDTNode[]>;
 export async function getNode(
   client: Arweave,
-  opts: GetNodeOpts<number, false>
+  opts: GetNodeOpts<number, false>,
 ): Promise<RDTBranchNode>;
 export async function getNode(
   client: Arweave,
-  opts: GetNodeOpts<number, true>
+  opts: GetNodeOpts<number, true>,
 ): Promise<RDTBranchNode[]>;
 export async function getNode<D extends number, F extends boolean>(
   client: Arweave,
@@ -56,8 +57,9 @@ export async function getNode<D extends number, F extends boolean>(
     depth = 0 as D,
     fetchGreedily = false as F,
     walletAddr,
-  }: GetNodeOpts<D, F>
+  }: GetNodeOpts<D, F>,
 ) {
+  if (tail === head) throw new TypeError("Argument error: Tail ID is the same as Head ID")
   if (!tail && !head) {
     throw new TypeError("Insufficient arguments: tail or head must be defined");
   }
@@ -84,33 +86,71 @@ export async function getNode<D extends number, F extends boolean>(
 
   if (prev.length) combined.push(and(...prev));
   if (next.length) combined.push(and(...next));
-
   query.push(or(...combined));
 
+  let prevNode: RDTNode | RDTBranchNode;
+  let lastWasBranch = false;
+  let deadEnd = false;
+  let branchTailNode: RDTNode | undefined;
   const txIds = await client.arql(query);
-  const nodes = await Promise.all(
-    txIds.map(async (txId, idx) => {
+  let nodes = await Promise.all(
+    txIds.flatMap(async (txId) => {
+      if (deadEnd) return [];
+
       const tags = await fetchTags(client, txId);
+      const isBranch = !!tags["Branch-Tail-Node"];
       const node = mapTagsToValues(
-        depth > 0 ? BRANCH_NODE_TAG_MAP : NODE_TAG_MAP,
-        tags
+        isBranch ? BRANCH_NODE_TAG_MAP : NODE_TAG_MAP,
+        tags,
       );
+
+      // Detect circular that doesn't use branches.
+      if (
+        node.head === prevNode.tail && prevNode.head === node.tail &&
+        prevNode.depth === node.depth
+      ) {
+        deadEnd = true;
+        return [];
+      }
 
       node.majorVersion = parseInt((node.majorVersion as unknown) as string);
       node.txId = txId;
       node.depth = parseInt((node.depth as unknown) as string) as 0;
       node.createdAt = new Date(node.createdAt);
 
-      if (idx) return node;
-    })
+      // Set the tail node to be conservative.
+      if (!lastWasBranch && isBranch) {
+        branchTailNode = prevNode;
+      }
+
+      if (lastWasBranch && !isBranch) {
+        if (!branchTailNode) {
+          const { branchTail } = node as RDTBranchNode;
+          branchTailNode = await getNode(
+            client,
+            { root, depth: prevNode.depth - 1, head: branchTail },
+          );
+        }
+
+        if (branchTailNode.createdAt.getTime() < node.createdAt.getTime()) {
+          deadEnd = true;
+          return [];
+        }
+      }
+
+      lastWasBranch = isBranch;
+      prevNode = node;
+
+      return node;
+    }),
   );
 
-  return nodes as D extends 0
-    ? F extends false
-      ? RDTNode
-      : RDTNode[]
-    : F extends false
-    ? RDTBranchNode
+  // @ts-expect-error
+  nodes = nodes.length === 1 ? nodes[0] : nodes;
+
+  return nodes as D extends 0 ? F extends false ? RDTNode
+  : RDTNode[]
+    : F extends false ? RDTBranchNode
     : RDTBranchNode[];
 }
 
@@ -122,15 +162,15 @@ interface GetNodeWithDirOpts<D extends number> {
 
 export function getTailNode(
   client: Arweave,
-  opts: GetNodeWithDirOpts<0>
+  opts: GetNodeWithDirOpts<0>,
 ): Promise<RDTNode>;
 export function getTailNode(
   client: Arweave,
-  opts: GetNodeWithDirOpts<number>
+  opts: GetNodeWithDirOpts<number>,
 ): Promise<RDTBranchNode>;
 export function getTailNode<D extends number>(
   client: Arweave,
-  { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>
+  { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>,
 ) {
   const { root, tail } = node;
   return getNode(client, { root, depth, head: tail, walletAddr });
@@ -138,15 +178,15 @@ export function getTailNode<D extends number>(
 
 export function getHeadNode(
   client: Arweave,
-  opts: GetNodeWithDirOpts<0>
+  opts: GetNodeWithDirOpts<0>,
 ): Promise<RDTNode>;
 export function getHeadNode(
   client: Arweave,
-  opts: GetNodeWithDirOpts<number>
+  opts: GetNodeWithDirOpts<number>,
 ): Promise<RDTBranchNode>;
 export function getHeadNode<D extends number>(
   client: Arweave,
-  { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>
+  { node, depth = 0 as D, walletAddr }: GetNodeWithDirOpts<D>,
 ) {
   const { root, head } = node;
   return getNode(client, { root, depth, tail: head, walletAddr });
@@ -173,11 +213,11 @@ interface TraverseNodesOpts<M extends number> {
 
 export function traverseNodes(
   client: Arweave,
-  opts: TraverseNodesOpts<0>
+  opts: TraverseNodesOpts<0>,
 ): AsyncGenerator<RDTNode>;
 export function traverseNodes(
   client: Arweave,
-  opts: TraverseNodesOpts<number>
+  opts: TraverseNodesOpts<number>,
 ): AsyncGenerator<RDTNode | RDTBranchNode>;
 export async function* traverseNodes<D extends number>(
   client: Arweave,
@@ -186,7 +226,7 @@ export async function* traverseNodes<D extends number>(
     amount,
     maxBranchDepth = 0 as D,
     walletAddr,
-  }: TraverseNodesOpts<D>
+  }: TraverseNodesOpts<D>,
 ): AsyncGenerator<RDTNode | RDTBranchNode> {
   if (!amount) return;
   const forward = Math.sign(amount) > 0 ? true : false;
