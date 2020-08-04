@@ -30,6 +30,8 @@ interface GetNodeOpts<D extends number, F extends boolean> {
   //      All nodes will be collected.
   fetchGreedily?: F;
   walletAddr?: string;
+
+  tags?: Record<string, string>;
 }
 
 export async function getNode(
@@ -57,6 +59,7 @@ export async function getNode<D extends number, F extends boolean>(
     depth = 0 as D,
     fetchGreedily = false as F,
     walletAddr,
+    tags,
   }: GetNodeOpts<D, F>,
 ) {
   if (tail === head) throw new TypeError("Argument error: Tail ID is the same as Head ID")
@@ -87,6 +90,10 @@ export async function getNode<D extends number, F extends boolean>(
   if (prev.length) combined.push(and(...prev));
   if (next.length) combined.push(and(...next));
   query.push(or(...combined));
+
+  const queryTags: ArqlOp[] = [];
+  for (const [key, value] of Object.entries(tags)) queryTags.push(equals(key, value));
+  query.push(or(...queryTags));
 
   let prevNode: RDTNode | RDTBranchNode;
   let lastWasBranch = false;
