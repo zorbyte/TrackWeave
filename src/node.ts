@@ -100,7 +100,7 @@ export async function getNode<D extends number, F extends boolean>(
   let lastWasBranch = false;
   let deadEnd = false;
   let branchTailNode: RDTNode | undefined;
-  const txIds = await client.arql(query);
+  const txIds = await client.arql(and(...query));
   let nodes = await Promise.all(
     txIds.flatMap(async (txId) => {
       if (deadEnd) return [];
