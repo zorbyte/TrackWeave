@@ -70,6 +70,8 @@ export async function findRootNode(
   // Get oldest one, as others are not the original.
   const txId = txIds[txIds.length - 1];
 
+  if (!txId) return;
+
   const nodeTags = await fetchTags(client, txId);
   const mapped = mapTagsToValues(ROOT_NODE_TAG_MAP, nodeTags);
   mapped.txId = txId;
