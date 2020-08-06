@@ -99,13 +99,13 @@ export async function getNode<D extends number, F extends boolean>(
 
   let prevNode: RDTNode | RDTBranchNode;
   let lastWasBranch = false;
-  let deadEnd = false;
+  let doNotContinue = false;
   let branchTailNode: RDTNode | undefined;
   const txIds = await client.arql(and(...query));
   if (!txIds.length) return;
   let nodes = await Promise.all(
     txIds.flatMap(async (txId) => {
-      if (deadEnd) return [];
+      if (doNotContinue) return [];
 
       const tags = await fetchTags(client, txId);
       const isBranch = !!tags["Branch-Tail-Node"];
@@ -120,7 +120,7 @@ export async function getNode<D extends number, F extends boolean>(
         prevNode.head === node.tail &&
         prevNode.depth === node.depth
       ) {
-        deadEnd = true;
+        doNotContinue = true;
         return [];
       }
 
@@ -134,6 +134,8 @@ export async function getNode<D extends number, F extends boolean>(
         branchTailNode = prevNode;
       }
 
+      // If we're on a branch rejoin and we were traversing said rejoining branch,
+      // verify the chronology of the rejoin.
       if (lastWasBranch && !isBranch && prevNode.head === node.tail) {
         if (!branchTailNode) {
           const { branchTail } = (prevNode as RDTBranchNode | undefined) ?? {};
@@ -146,8 +148,8 @@ export async function getNode<D extends number, F extends boolean>(
           });
         }
 
-        if (branchTailNode!.createdAt.getTime() < node.createdAt.getTime()) {
-          deadEnd = true;
+        if (branchTailNode!.createdAt.getTime() > node.createdAt.getTime()) {
+          doNotContinue = true;
           return [];
         }
       }
