@@ -35,11 +35,12 @@ interface FindRootNodeOpts {
   // Either the id of the root node, or a node with the root node ID.
   abstractNode?: AbstractRDTRootNode;
   walletAddr?: string;
+  tags?: Record<string, string>;
 }
 
 export async function findRootNode(
   client: Arweave,
-  { abstractNode, walletAddr }: FindRootNodeOpts
+  { abstractNode, walletAddr, tags }: FindRootNodeOpts
 ) {
   if (!abstractNode && !walletAddr) {
     throw new TypeError(
@@ -47,7 +48,11 @@ export async function findRootNode(
     );
   }
 
-  const exprs = [equals("RDT-Type", NodeType.Root)];
+  const exprs = [
+    equals("RDT-Type", NodeType.Root),
+    ...(tags ? Object.entries(tags).map(([key, val]) => equals(key, val)) : []),
+  ];
+
   if (walletAddr) exprs.push(equals("from", walletAddr));
   if (abstractNode) {
     exprs.push(
@@ -65,8 +70,8 @@ export async function findRootNode(
   // Get oldest one, as others are not the original.
   const txId = txIds[txIds.length - 1];
 
-  const tags = await fetchTags(client, txId);
-  const mapped = mapTagsToValues(ROOT_NODE_TAG_MAP, tags);
+  const nodeTags = await fetchTags(client, txId);
+  const mapped = mapTagsToValues(ROOT_NODE_TAG_MAP, nodeTags);
   mapped.txId = txId;
   mapped.createdAt = new Date(mapped.createdAt);
 
