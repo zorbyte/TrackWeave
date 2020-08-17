@@ -40,11 +40,11 @@ interface FindRootNodeOpts {
 
 export async function findRootNode(
   client: Arweave,
-  { abstractNode, walletAddr, tags }: FindRootNodeOpts
+  { abstractNode, walletAddr, tags }: FindRootNodeOpts,
 ) {
   if (!abstractNode && !walletAddr) {
     throw new TypeError(
-      "Insufficient arguments: abstractNode and/or walletAddr must be provided"
+      "Insufficient arguments: abstractNode and/or walletAddr must be provided",
     );
   }
 
@@ -58,8 +58,8 @@ export async function findRootNode(
     exprs.push(
       equals(
         "Root-Id",
-        typeof abstractNode === "string" ? abstractNode : abstractNode!.root
-      )
+        typeof abstractNode === "string" ? abstractNode : abstractNode!.root,
+      ),
     );
   }
 
