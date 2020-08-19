@@ -56,7 +56,7 @@ export function mapValuesToTags<
 }
 
 export async function fetchTags(client: Arweave, txId: string) {
-  const { status, statusText, data } = await client.api.get(txId);
+  const { status, statusText, data } = await client.api.get(`${txId}/tags`);
 
   if (status >= 300) throw new Error(`${status}: ${statusText}`);
 
