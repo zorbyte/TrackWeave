@@ -2,7 +2,7 @@ import { RDTRootNode, ROOT_NODE_TAG_MAP, AbstractRDTRootNode } from "./root";
 import { TagMap, fetchTags, mapTagsToValues } from "./tags";
 import { RDTBranchNode, BRANCH_NODE_TAG_MAP } from "./branch";
 import { Arweave, genTargetWalletOps } from "./utils";
-import { NodeType } from ".";
+import type { NodeType, RDTAnyNode } from ".";
 
 import { ArqlOp, equals, and, or } from "arql-ops";
 
@@ -38,11 +38,11 @@ interface GetNodeOpts<D extends number, F extends boolean> {
 export async function getNode(
   client: Arweave,
   opts: GetNodeOpts<0, false>,
-): Promise<RDTRootNode<NodeType> | undefined>;
+): Promise<RDTAnyNode | undefined>;
 export async function getNode(
   client: Arweave,
   opts: GetNodeOpts<0, true>,
-): Promise<RDTRootNode<NodeType>[] | undefined>;
+): Promise<RDTAnyNode[] | undefined>;
 export async function getNode(
   client: Arweave,
   opts: GetNodeOpts<number, false>,
@@ -103,7 +103,7 @@ export async function getNode<D extends number, F extends boolean>(
   if (next.length) combined.push(and(...next));
   query.push(or(...combined));
 
-  let prevNode: RDTRootNode<NodeType> | RDTBranchNode | undefined;
+  let prevNode: RDTAnyNode | RDTBranchNode | undefined;
   let lastWasBranch = false;
   let doNotContinue = false;
   let branchTailNode: RDTNode | undefined;
@@ -182,14 +182,14 @@ export async function getNode<D extends number, F extends boolean>(
   // @ts-expect-error
   nodes = depth === 0 && nodes.length === 1 ? nodes[0] : nodes;
 
-  return nodes as D extends 0 ? F extends false ? RDTRootNode<NodeType>
-  : RDTRootNode<NodeType>[]
+  return nodes as D extends 0 ? F extends false ? RDTAnyNode
+  : RDTAnyNode[]
     : F extends false ? RDTBranchNode
     : RDTBranchNode[];
 }
 
 interface GetNodeWithDirOpts<D extends number> {
-  node: RDTRootNode<NodeType>;
+  node: RDTAnyNode;
   depth?: D;
   walletAddr?: string;
 }
@@ -197,7 +197,7 @@ interface GetNodeWithDirOpts<D extends number> {
 export function getTailNode(
   client: Arweave,
   opts: GetNodeWithDirOpts<0>,
-): Promise<RDTRootNode<NodeType> | undefined>;
+): Promise<RDTAnyNode | undefined>;
 export function getTailNode(
   client: Arweave,
   opts: GetNodeWithDirOpts<number>,
@@ -227,7 +227,7 @@ export function getHeadNode<D extends number>(
 }
 
 interface TraverseNodesOpts<M extends number> {
-  entryNode: RDTRootNode<NodeType>;
+  entryNode: RDTAnyNode;
 
   // Amount of nodes to traverse, Infinity is permitted.
   // Use positive or negative numbers to indicate direction.
@@ -248,7 +248,7 @@ interface TraverseNodesOpts<M extends number> {
 export function traverseNodes(
   client: Arweave,
   opts: TraverseNodesOpts<0>,
-): AsyncGenerator<RDTRootNode<NodeType>>;
+): AsyncGenerator<RDTAnyNode>;
 export function traverseNodes(
   client: Arweave,
   opts: TraverseNodesOpts<number>,
@@ -261,7 +261,7 @@ export async function* traverseNodes<D extends number>(
     maxBranchDepth = 0 as D,
     walletAddr,
   }: TraverseNodesOpts<D>,
-): AsyncGenerator<RDTRootNode<NodeType> | RDTBranchNode> {
+): AsyncGenerator<RDTAnyNode | RDTBranchNode> {
   if (!amount) return;
   const forward = Math.sign(amount) > 0 ? true : false;
   if (!entryNode.tail && !forward) return;
@@ -273,7 +273,7 @@ export async function* traverseNodes<D extends number>(
       node,
       depth: maxBranchDepth,
       walletAddr,
-    })) as RDTRootNode<NodeType> | RDTBranchNode;
+    })) as RDTAnyNode | RDTBranchNode;
 
     if (!res || !res.tail) return;
     node = res;

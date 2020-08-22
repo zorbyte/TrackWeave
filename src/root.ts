@@ -15,7 +15,7 @@ export interface RDTRootNode<T = NodeType.Root> {
   tail?: string;
   head: string;
 
-  otherTags?: Record<string, string>;
+  otherTags: Record<string, string>;
 }
 
 export type AbstractRDTRootNode = string | RDTRootNode;
