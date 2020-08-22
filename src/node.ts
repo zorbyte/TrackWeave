@@ -30,6 +30,7 @@ interface GetNodeOpts<D extends number, F extends boolean> {
   //      All nodes will be collected.
   fetchGreedily?: F;
   walletAddr?: string;
+  walletDirs?: ("to" | "from")[];
 
   tags?: Record<string, string>;
 }
@@ -59,6 +60,7 @@ export async function getNode<D extends number, F extends boolean>(
     depth = 0 as D,
     fetchGreedily = false as F,
     walletAddr,
+    walletDirs = ["to", "from"],
     tags,
   }: GetNodeOpts<D, F>,
 ) {
@@ -82,7 +84,8 @@ export async function getNode<D extends number, F extends boolean>(
 
   // This chain concerns this wallet addr.
   if (walletAddr) {
-    curr.push(or(equals("from", walletAddr), equals("to", walletAddr)));
+    const walletOps = walletDirs.map((dir) => equals(dir, walletAddr));
+    curr.push(...(walletDirs.length > 1 ? [or(...walletOps)] : walletOps));
   }
 
   if (tail) {
