@@ -1,6 +1,6 @@
 {
   "name": "trackweave",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "A new and intuitive way to link Arweave transactions",
   "main": "./dist/index.js",
   "files": [
