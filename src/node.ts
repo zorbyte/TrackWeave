@@ -1,7 +1,7 @@
 import { RDTRootNode, ROOT_NODE_TAG_MAP, AbstractRDTRootNode } from "./root";
 import { TagMap, fetchTags, mapTagsToValues } from "./tags";
 import { RDTBranchNode, BRANCH_NODE_TAG_MAP } from "./branch";
-import { Arweave } from "./utils";
+import { Arweave, genTargetWalletOps } from "./utils";
 import { NodeType } from ".";
 
 import { ArqlOp, equals, and, or } from "arql-ops";
@@ -84,8 +84,7 @@ export async function getNode<D extends number, F extends boolean>(
 
   // This chain concerns this wallet addr.
   if (walletAddr) {
-    const walletOps = walletDirs.map((dir) => equals(dir, walletAddr));
-    curr.push(...(walletDirs.length > 1 ? [or(...walletOps)] : walletOps));
+    curr.push(...genTargetWalletOps(walletAddr, walletDirs));
   }
 
   if (tail) {

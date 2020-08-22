@@ -1,6 +1,6 @@
 import { TagMap, fetchTags, mapTagsToValues } from "./tags";
-import { Arweave } from "./utils";
-import { and, equals } from "arql-ops";
+import { Arweave, genTargetWalletOps } from "./utils";
+import { and, equals, ArqlOp } from "arql-ops";
 import { NodeType } from ".";
 
 export interface RDTRootNode<T = NodeType.Root> {
@@ -35,12 +35,18 @@ interface FindRootNodeOpts {
   // Either the id of the root node, or a node with the root node ID.
   abstractNode?: AbstractRDTRootNode;
   walletAddr?: string;
+  walletDirs?: ("to" | "from")[];
   tags?: Record<string, string>;
 }
 
 export async function findRootNode(
   client: Arweave,
-  { abstractNode, walletAddr, tags }: FindRootNodeOpts,
+  {
+    abstractNode,
+    walletAddr,
+    walletDirs = ["to", "from"],
+    tags,
+  }: FindRootNodeOpts,
 ) {
   if (!abstractNode && !walletAddr) {
     throw new TypeError(
@@ -48,12 +54,12 @@ export async function findRootNode(
     );
   }
 
-  const exprs = [
+  const exprs: ArqlOp[] = [
     equals("RDT-Type", NodeType.Root),
     ...(tags ? Object.entries(tags).map(([key, val]) => equals(key, val)) : []),
   ];
 
-  if (walletAddr) exprs.push(equals("from", walletAddr));
+  if (walletAddr) exprs.push(...genTargetWalletOps(walletAddr, walletDirs));
   if (abstractNode) {
     exprs.push(
       equals(
