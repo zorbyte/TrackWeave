@@ -73,7 +73,7 @@ export async function getNode<D extends number, F extends boolean>(
   }
 
   const prev: ArqlOp[] = [];
-  const curr: ArqlOp[] = [equals("Branch-Depth", depth.toString())];
+  const curr: ArqlOp[] = [];
   const next: ArqlOp[] = [];
   const query: ArqlOp[] = [
     equals("Root-Id", typeof root === "string" ? root : root.root),
@@ -114,11 +114,14 @@ export async function getNode<D extends number, F extends boolean>(
       if (doNotContinue) return [];
 
       const tags = await fetchTags(client, txId);
+      const isRoot = tags["RDT-Type"] === "root";
       const isBranch = !!tags["Branch-Tail-Node"];
       const node = mapTagsToValues(
         isBranch ? BRANCH_NODE_TAG_MAP : NODE_TAG_MAP,
         tags,
       );
+
+      if ((isRoot && depth > 0) || !isRoot && node.depth !== depth) return [];
 
       // Detect circular that doesn't use branches.
       if (
@@ -132,10 +135,12 @@ export async function getNode<D extends number, F extends boolean>(
         return [];
       }
 
+      node.createdAt = new Date(parseInt(node.createdAt as unknown as string));
       node.majorVersion = parseInt((node.majorVersion as unknown) as string);
       node.txId = txId;
-      node.depth = parseInt((node.depth as unknown) as string) as 0;
-      node.createdAt = new Date(node.createdAt);
+      if (!isRoot) {
+        node.depth = parseInt((node.depth as unknown) as string) as 0;
+      }
 
       // Set the tail node to be conservative.
       if (
@@ -180,7 +185,7 @@ export async function getNode<D extends number, F extends boolean>(
   );
 
   // @ts-expect-error
-  nodes = depth === 0 && nodes.length === 1 ? nodes[0] : nodes;
+  nodes = depth === 0 ? nodes[0] : nodes;
 
   return nodes as D extends 0 ? F extends false ? RDTAnyNode
   : RDTAnyNode[]

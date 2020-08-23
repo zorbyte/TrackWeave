@@ -10,7 +10,7 @@ export type TagMap<N extends RDTAnyNode> = {
 type TagType<M extends TagMap<RDTRootNode>> = M extends TagMap<infer T> ? T
   : never;
 
-const DEFAULT_IGNORED_KEYS = ["txId", "otherTags", "waypoint"] as const;
+const DEFAULT_IGNORED_KEYS = ["txId", "otherTags"] as const;
 
 export function mapTagsToValues<
   M extends TagMap<RDTRootNode>,
@@ -20,13 +20,14 @@ export function mapTagsToValues<
   const inverted = getInverted(tagMap);
 
   const mappedKeys = [];
-
   for (const [key, value] of Object.entries(tags)) {
     const mappableKey = inverted[key];
-    if (!mappableKey) mapped.otherTags[key] = (value as unknown) as string;
-
-    mapped[mappableKey as keyof T] = (value as unknown) as T[keyof T];
-    mappedKeys.push(key);
+    if (mappableKey) {
+      mapped[mappableKey as keyof T] = (value as unknown) as T[keyof T];
+      mappedKeys.push(key);
+    } else {
+      mapped.otherTags[key] = (value as unknown) as string;
+    }
   }
 
   return mapped;
@@ -52,7 +53,7 @@ export function mapValuesToTags<
 }
 
 export async function fetchTags(client: Arweave, txId: string) {
-  const { status, statusText, data } = await client.api.get(`${txId}/tags`);
+  const { status, statusText, data } = await client.api.get(`tx/${txId}/tags`);
 
   if (status >= 300) throw new Error(`${status}: ${statusText}`);
 
@@ -72,7 +73,7 @@ const invertedTagMaps = new WeakMap<TagMap<RDTRootNode>, any>();
 function getInverted<N extends RDTRootNode, M extends TagMap<N>>(tagMap: M) {
   let inverted: { [k: string]: keyof M } = invertedTagMaps.get(tagMap);
   if (!inverted) {
-    inverted = invertObj(invertObj);
+    inverted = invertObj(tagMap);
     invertedTagMaps.set(tagMap, inverted);
   }
 

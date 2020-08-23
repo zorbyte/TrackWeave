@@ -39,7 +39,7 @@ interface FindRootNodeOpts {
   tags?: Record<string, string>;
 }
 
-export async function findRootNode(
+export async function fetchRootNode(
   client: Arweave,
   {
     abstractNode,
@@ -81,7 +81,8 @@ export async function findRootNode(
   const nodeTags = await fetchTags(client, txId);
   const mapped = mapTagsToValues(ROOT_NODE_TAG_MAP, nodeTags);
   mapped.txId = txId;
-  mapped.createdAt = new Date(mapped.createdAt);
+  mapped.majorVersion = parseInt(mapped.majorVersion as unknown as string);
+  mapped.createdAt = new Date(parseInt(mapped.createdAt as unknown as string));
 
   return mapped;
 }

@@ -7,7 +7,7 @@ import {
   getHeadNode,
   traverseNodes,
 } from "./node";
-import { RDTRootNode, ROOT_NODE_TAG_MAP, findRootNode } from "./root";
+import { RDTRootNode, ROOT_NODE_TAG_MAP, fetchRootNode } from "./root";
 
 import { nanoid } from "nanoid";
 import { mapValuesToTags } from "./tags";
@@ -20,7 +20,7 @@ export const enum NodeType {
   Node = "node",
 }
 
-export function createRootNode(): RDTAnyNode;
+export function createRootNode(): RDTRootNode;
 export function createRootNode<N extends RDTAnyNode>(
   tailNode: N,
 ): RDTRootNode & { tail: string };
@@ -87,7 +87,7 @@ export function getNodeTags<N extends RDTAnyNode>(node: N) {
   return tags;
 }
 
-export { RDTRootNode, findRootNode };
+export { RDTRootNode, fetchRootNode };
 
 export { RDTNode, getNode, getTailNode, getHeadNode, traverseNodes };
 
