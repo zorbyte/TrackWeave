@@ -44,7 +44,7 @@ export function mapValuesToTags<
   for (const [key, value] of Object.entries(node)) {
     const resultKey = tagMap[key as keyof M];
     if (!resultKey) continue;
-    result[resultKey] = value.toString?.() ?? `${value}`;
+    result[resultKey] = value?.toString?.() ?? `${value}`;
   }
 
   result = { ...result, ...otherTags };
