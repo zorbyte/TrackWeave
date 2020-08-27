@@ -9,7 +9,7 @@ import {
 } from "./node";
 import { RDTRootNode, ROOT_NODE_TAG_MAP, fetchRootNode } from "./root";
 
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 import { mapValuesToTags } from "./tags";
 
 export const MAJOR_VERSION = 0;
